@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physics_viewer</title>
+  <style>
+    :root {
+      --bg: #14161a;
+      --panel: #1d2026;
+      --line: #2a2e36;
+      --text: #e6e8eb;
+      --muted: #9aa0a8;
+      --accent: #ff5a3c;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg); color: var(--text); }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; }
+
+    #panel {
+      position: absolute; top: 16px; left: 16px; width: 250px;
+      background: color-mix(in srgb, var(--panel) 92%, transparent);
+      border: 1px solid var(--line); border-radius: 12px;
+      padding: 14px; backdrop-filter: blur(8px);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    #panel h1 { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: .04em;
+      text-transform: uppercase; color: var(--muted); }
+    .row { display: flex; gap: 8px; align-items: center; }
+    label { font-size: 12px; color: var(--muted); flex: 0 0 64px; }
+    select, button, input[type="number"] {
+      background: var(--bg); color: var(--text);
+      border: 1px solid var(--line); border-radius: 8px;
+      padding: 7px 9px; font-size: 13px; font-family: inherit;
+    }
+    select, input[type="number"] { flex: 1; min-width: 0; }
+    button { cursor: pointer; transition: border-color .15s, background .15s; }
+    button:hover { border-color: var(--accent); }
+    button.primary { background: var(--accent); border-color: var(--accent);
+      color: #1a0d09; font-weight: 600; }
+    #controls { display: flex; gap: 8px; }
+    #controls button { flex: 1; }
+    #scrub { width: 100%; accent-color: var(--accent); }
+    #readout { font-variant-numeric: tabular-nums; font-size: 12px;
+      color: var(--muted); display: flex; justify-content: space-between; }
+    #status { font-size: 12px; color: var(--muted); min-height: 16px; }
+    #status.error { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="panel">
+    <h1>physics_viewer</h1>
+
+    <div class="row">
+      <label for="scene">Scene</label>
+      <select id="scene"></select>
+    </div>
+    <div class="row">
+      <label for="frames">Frames</label>
+      <input id="frames" type="number" value="600" min="1" max="20000" step="50" />
+    </div>
+    <div class="row">
+      <label for="dt">dt (s)</label>
+      <input id="dt" type="number" value="0.01" min="0.0001" max="1" step="0.005" />
+    </div>
+
+    <button id="run" class="primary">Run simulation</button>
+
+    <input id="scrub" type="range" min="0" max="0" value="0" step="1" />
+    <div id="controls">
+      <button id="play">Pause</button>
+      <button id="reset">Reset</button>
+    </div>
+    <div id="readout"><span id="t-label">t = 0.000 s</span><span id="f-label">0 / 0</span></div>
+    <div id="status"></div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
