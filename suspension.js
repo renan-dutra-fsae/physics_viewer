@@ -211,13 +211,32 @@ function lineChart(xs, ys, color, xlabel) {
 
 function drawCharts(k) {
   const t = k.travel_mm;
-  el("chart-camber").innerHTML = lineChart(t, k.camber_deg, "#ff5a3c", "travel [mm] vs camber [deg]");
-  el("chart-scrub").innerHTML = lineChart(t, k.scrub_mm, "#5b8def", "travel [mm] vs scrub [mm]");
-  el("chart-rc").innerHTML = lineChart(t, k.rc_height_mm, "#3cba7a", "travel [mm] vs RC height [mm]");
-  if (k.motion_ratio) {
-    el("chart-mr").innerHTML = lineChart(t, k.motion_ratio, "#b07cff", "travel [mm] vs MR (d/w)");
-  } else {
-    el("chart-mr").innerHTML = `<svg viewBox="0 0 260 150"><text x="130" y="75" fill="#6b7280" font-size="11" text-anchor="middle">add rocker hardpoints</text></svg>`;
+  // [data array, title, x-axis label, color]; skipped if data is missing
+  const specs = [
+    [k.camber_deg, "Camber gain", "camber [deg]", "#ff5a3c"],
+    [k.scrub_mm, "Half-track change", "scrub [mm]", "#5b8def"],
+    [k.rc_height_mm, "Roll center height", "RC height [mm]", "#3cba7a"],
+    [k.motion_ratio, "Motion ratio", "MR [damper/wheel]", "#b07cff"],
+    [k.kpi_deg, "Kingpin inclination", "KPI [deg]", "#f5a524"],
+    [k.scrub_radius_mm, "Scrub radius", "scrub radius [mm]", "#e6e8eb"],
+    [k.fvsa_m, "Swing-arm length (FVSA)", "FVSA [m]", "#ff7ab6"],
+  ];
+
+  const root = el("charts");
+  root.innerHTML = "";
+  for (const [data, title, xlabel, color] of specs) {
+    if (!data) continue;                         // e.g. no rocker -> no motion ratio
+    // drop points where the metric is null (e.g. FVSA at parallel arms)
+    const travelVals = [], metricVals = [];
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] != null) { travelVals.push(t[i]); metricVals.push(data[i]); }
+    }
+    const card = document.createElement("div");
+    card.className = "chart";
+    card.innerHTML = `<h2>${title}</h2>` +
+      (metricVals.length ? lineChart(metricVals, travelVals, color, xlabel)
+                         : `<svg viewBox="0 0 260 150"></svg>`);
+    root.appendChild(card);
   }
 }
 
@@ -225,13 +244,16 @@ function showReadouts(k) {
   const t = k.travel_mm, c = k.camber_deg;
   const mid = Math.floor(t.length / 2);
   const gain = (c[mid + 1] - c[mid - 1]) / (t[mid + 1] - t[mid - 1]); // deg/mm
-  let html =
-    `<span>camber gain</span> <b>${(gain * 25).toFixed(3)}°/25mm</b>` +
-    `&nbsp;&nbsp; <span>roll center @ ride</span> <b>${k.rc_height_mm[mid].toFixed(1)} mm</b>`;
-  if (k.motion_ratio) {
-    html += `&nbsp;&nbsp; <span>motion ratio @ ride</span> <b>${k.motion_ratio[mid].toFixed(3)}</b>`;
-  }
-  el("readouts").innerHTML = html;
+  const item = (label, val) => `<span>${label}</span> <b>${val}</b>`;
+  const parts = [
+    item("camber gain", `${(gain * 25).toFixed(3)}°/25mm`),
+    item("roll center @ ride", `${k.rc_height_mm[mid].toFixed(1)} mm`),
+  ];
+  if (k.motion_ratio) parts.push(item("motion ratio @ ride", k.motion_ratio[mid].toFixed(3)));
+  if (k.kpi_deg) parts.push(item("KPI", `${k.kpi_deg[mid].toFixed(2)}°`));
+  if (k.scrub_radius_mm) parts.push(item("scrub radius", `${k.scrub_radius_mm[mid].toFixed(1)} mm`));
+  if (k.fvsa_m && k.fvsa_m[mid] != null) parts.push(item("FVSA", `${k.fvsa_m[mid].toFixed(2)} m`));
+  el("readouts").innerHTML = parts.join("&nbsp;&nbsp; ");
 }
 
 // --- animation loop -------------------------------------------------------- //

@@ -41,7 +41,7 @@
     .readouts span { color: var(--muted); }
     #linkage { width: 100%; height: 440px; background: #0e1013;
       border: 1px solid var(--line); border-radius: 12px; }
-    .charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .chart { background: #0e1013; border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
     .chart h2 { margin: 0 0 4px 6px; }
     .chart svg { width: 100%; height: 150px; }
@@ -73,12 +73,7 @@
         <div class="readouts" id="readouts"><span>Run a geometry to see results.</span></div>
       </div>
       <svg id="linkage" viewBox="0 0 600 440" xmlns="http://www.w3.org/2000/svg"></svg>
-      <div class="charts">
-        <div class="chart"><h2>Camber gain</h2><div id="chart-camber"></div></div>
-        <div class="chart"><h2>Half-track change (scrub)</h2><div id="chart-scrub"></div></div>
-        <div class="chart"><h2>Roll center height</h2><div id="chart-rc"></div></div>
-        <div class="chart"><h2>Motion ratio</h2><div id="chart-mr"></div></div>
-      </div>
+      <div class="charts" id="charts"></div>
     </div>
   </div>
 
