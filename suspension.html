@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>suspension tuner</title>
+  <style>
+    :root {
+      --bg: #14161a; --panel: #1d2026; --line: #2a2e36;
+      --text: #e6e8eb; --muted: #9aa0a8; --accent: #ff5a3c; --chassis: #5b8def;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    h1 { font-size: 14px; letter-spacing: .04em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px; }
+    h2 { font-size: 12px; color: var(--muted); margin: 0 0 8px; font-weight: 600; }
+    .wrap { display: grid; grid-template-columns: 320px 1fr; gap: 16px; padding: 16px; }
+    .panel { background: var(--panel); border: 1px solid var(--line);
+      border-radius: 12px; padding: 14px; }
+    .hp-row { display: grid; grid-template-columns: 1fr 64px 64px; gap: 6px;
+      align-items: center; margin-bottom: 5px; }
+    .hp-row label { font-size: 11px; color: var(--muted); }
+    .hp-row.head { color: var(--muted); font-size: 10px; text-transform: uppercase; }
+    .hp-row.optional label { color: #6b7280; }
+    input[type="number"] { width: 100%; background: var(--bg); color: var(--text);
+      border: 1px solid var(--line); border-radius: 6px; padding: 5px 6px; font-size: 12px; }
+    .controls { display: flex; gap: 8px; align-items: center; margin: 12px 0; }
+    button { cursor: pointer; background: var(--bg); color: var(--text);
+      border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+    button.primary { background: var(--accent); border-color: var(--accent);
+      color: #1a0d09; font-weight: 600; flex: 1; }
+    button:hover { border-color: var(--accent); }
+    .travel { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+    .travel input { width: 64px; }
+    #status { font-size: 12px; color: var(--muted); min-height: 16px; margin-top: 6px; }
+    #status.error { color: var(--accent); }
+    #stage { display: flex; flex-direction: column; gap: 16px; }
+    .readouts { display: flex; gap: 20px; flex-wrap: wrap; font-size: 13px; }
+    .readouts b { color: var(--text); font-variant-numeric: tabular-nums; }
+    .readouts span { color: var(--muted); }
+    #linkage { width: 100%; height: 440px; background: #0e1013;
+      border: 1px solid var(--line); border-radius: 12px; }
+    .charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .chart { background: #0e1013; border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+    .chart h2 { margin: 0 0 4px 6px; }
+    .chart svg { width: 100%; height: 150px; }
+    .file-label { font-size: 12px; color: var(--muted); }
+    input[type="file"] { font-size: 11px; color: var(--muted); max-width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <h1>Suspension tuner</h1>
+      <h2>Hardpoints — front view, metres (y, z)</h2>
+      <div id="inputs"></div>
+
+      <div class="controls">
+        <button id="run" class="primary">Run</button>
+        <div class="travel"><span>±travel</span><input id="travel" type="number"
+          value="30" min="1" max="200" step="5" /><span>mm</span></div>
+      </div>
+      <div>
+        <div class="file-label">Load hardpoints CSV (name,y,z):</div>
+        <input id="csv" type="file" accept=".csv,text/csv" />
+      </div>
+      <div id="status"></div>
+    </div>
+
+    <div id="stage">
+      <div class="panel">
+        <div class="readouts" id="readouts"><span>Run a geometry to see results.</span></div>
+      </div>
+      <svg id="linkage" viewBox="0 0 600 440" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="charts">
+        <div class="chart"><h2>Camber gain</h2><div id="chart-camber"></div></div>
+        <div class="chart"><h2>Half-track change (scrub)</h2><div id="chart-scrub"></div></div>
+        <div class="chart"><h2>Roll center height</h2><div id="chart-rc"></div></div>
+        <div class="chart"><h2>Motion ratio</h2><div id="chart-mr"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/suspension.js"></script>
+</body>
+</html>
